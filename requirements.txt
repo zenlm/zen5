@@ -1,0 +1,6 @@
+torch>=2.4
+transformers>=4.48
+safetensors
+huggingface_hub
+accelerate
+bitsandbytes
