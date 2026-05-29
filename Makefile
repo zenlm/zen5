@@ -32,10 +32,15 @@ CPU_CORE_OBJS = ds4_cpu.o
 METAL_LDLIBS := $(LDLIBS)
 endif
 
-.PHONY: all help clean test cpu cuda cuda-spark cuda-generic cuda-regression
+.PHONY: all help clean test cpu cuda cuda-spark cuda-generic cuda-regression zen5-aliases
 
 ifeq ($(UNAME_S),Darwin)
-all: ds4 ds4-server ds4-bench
+all: ds4 ds4-server ds4-bench zen5-aliases
+
+zen5-aliases: ds4 ds4-server ds4-bench
+	@ln -sf ds4 zen5
+	@ln -sf ds4-server zen5-server
+	@ln -sf ds4-bench zen5-bench
 
 help:
 	@echo "DS4 build targets:"
@@ -161,3 +166,4 @@ test: ds4_test
 
 clean:
 	rm -f ds4 ds4-server ds4-bench ds4_cpu ds4_native ds4_server_test ds4_test *.o tests/cuda_long_context_smoke tests/cuda_long_context_smoke.o
+	rm -f zen5 zen5-server zen5-bench
