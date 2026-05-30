@@ -315,12 +315,12 @@ Each model family learns fundamentally different representations:
 
 | Fusion | Benefit |
 |--------|---------|
-| Qwen 0.8B + Kimi 1T | 2000x compute range in one model |
-| MiniMax + Qwen3.5 | Lightning Attention for 1M context + DeltaNet for 262K precision |
+| 0.8B + Kimi 1T | 2000x compute range in one model |
+| + | Lightning Attention for 1M context + DeltaNet for 262K precision |
 | Kimi K2.5 + GLM-5 | 384 experts (code/math) + 256 experts (multilingual/reasoning) |
 | Wan2.2 + TRELLIS.2 | Video understanding → 3D reconstruction pipeline |
-| Qwen3-VL + CogVideoX | Image understanding → video generation |
-| Qwen3-Omni + zen-tts | Speech understanding → speech synthesis |
+| -VL + CogVideoX | Image understanding → video generation |
+| -Omni + zen-tts | Speech understanding → speech synthesis |
 
 ---
 
@@ -408,10 +408,10 @@ Complexity ground truth from:
 
 Train cross-modal routing and diffusion heads:
 
-1. **Vision**: Fine-tune alignment between Qwen3-VL and text experts
+1. **Vision**: Fine-tune alignment between -VL and text experts
 2. **Video**: Train Transfusion-style diffusion head on video-text pairs
 3. **3D**: Connect TRELLIS.2/zen-3d experts with vision→3D routing
-4. **Audio**: Align Qwen3-Omni audio encoder with text experts
+4. **Audio**: Align -Omni audio encoder with text experts
 
 ### Phase 5: Expert LoRA Fine-tuning (Optional, 1-2 weeks)
 
@@ -531,7 +531,7 @@ omnimodal:
 
 ### zen5 (General, 750B)
 - Text-only, complexity-routed
-- Qwen3.5-0.8B (T0) + Qwen3.5-9B (T1) + GLM-5 (T2-T3)
+- -0.8B (T0) + -9B (T1) + GLM-5 (T2-T3)
 - Good for: Chat, summarization, general Q&A, translation
 
 ### zen5-coder (Code, 1.8T)
@@ -541,7 +541,7 @@ omnimodal:
 
 ### zen5-omni (Omnimodal, 2.5T)
 - Text + vision + video + 3D + audio
-- Adds Qwen3-VL, Wan2.2, CogVideoX, TRELLIS.2, zen-3d, Qwen3-Omni
+- Adds -VL, Wan2.2, CogVideoX, TRELLIS.2, zen-3d, -Omni
 - Good for: "Describe this video", "Generate a 3D model of X", multimodal reasoning
 
 ### zen5-max (Frontier, 3.1T)
@@ -591,7 +591,7 @@ zen5's key differentiator: **adaptive compute**. Behemoth always uses 288B activ
 - [ ] Expert extraction from all 6 text models
 - [ ] Alignment layer training (64x A100, 2-3 weeks)
 - [ ] Complexity router prototype + evaluation
-- [ ] Vision expert integration (Qwen3-VL)
+-  Vision expert integration (-VL)
 
 ### Q3 2026 (July → September)
 - [ ] Full router training (64x A100, 2-4 weeks)
@@ -612,7 +612,7 @@ zen5's key differentiator: **adaptive compute**. Behemoth always uses 288B activ
 - **HMoE** (EMNLP 2025) — Heterogeneous expert sizes outperform homogeneous
 - **Symbolic-MoE** (arXiv 2503.05641) — Skill-based routing, 8.15% gain over GPT-4o-mini
 - **Transfusion** (Meta 2024) — Unified autoregressive + diffusion in single model
-- **DeepSeek-V3** — 671B MoE with 384 experts, top-8 routing
+- **** — 671B MoE with 384 experts, top-8 routing
 - **Wan2.2** — MoE diffusion for video generation
 - **CogVideoX** (ICLR 2025) — Expert transformer with 3D Causal VAE
 - **TripoSR** — Feed-forward 3D from single image, MIT licensed
