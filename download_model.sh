@@ -1,7 +1,8 @@
 #!/bin/sh
 set -e
 
-REPO="antirez/deepseek-v4-gguf"
+REPO="zenlm/zen-5-flash-gguf"
+UPSTREAM_REPO="antirez/deepseek-v4-gguf"
 Q2_FILE="DeepSeek-V4-Flash-IQ2XXS-w2Q2K-AProjQ8-SExpQ8-OutQ8-chat-v2.gguf"
 Q2_IMATRIX_FILE="DeepSeek-V4-Flash-IQ2XXS-w2Q2K-AProjQ8-SExpQ8-OutQ8-chat-v2-imatrix.gguf"
 Q4_FILE="DeepSeek-V4-Flash-Q4KExperts-F16HC-F16Compressor-F16Indexer-Q8Attn-Q8Shared-Q8Out-chat-v2.gguf"
