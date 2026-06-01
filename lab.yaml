@@ -1,0 +1,67 @@
+# zen5 home lab — 4 heterogeneous nodes, 448 GB unified memory total.
+#
+# Hostnames are mDNS names on the local network. Confirm reachable with:
+#   bin/lab self-test
+#
+#   spark.local — DGX Spark GB10 Blackwell, 128 GB, 200 GbE ConnectX-7  → coordinator + worker
+#   dbc.local   — MacBook Pro M4 Max, 128 GB                            → worker (MLX)
+#   evo.local   — GMKtec EVO-X2 (Ryzen AI Max+ 395, Strix Halo 8060S)   → worker (ROCm)
+#   m1max.local — MacBook Pro M1 Max, 64 GB                             → worker (MLX)
+#
+# Spark wins coordinator because (a) ConnectX-7 200 GbE — 20× any other NIC,
+# (b) Blackwell tensor cores are 5–10× the others for trim-mean reductions,
+# (c) it's the only box that can serve aggregates + train concurrently.
+# It's also a worker — too much memory + Blackwell to leave idle.
+#
+# Sync at LoRA-delta granularity over HTTP — no cross-vendor NCCL/Gloo.
+# Aggregation: byzantine_robust (trimmed mean, tolerates 1 bad worker).
+# Auth: ZEN_LAB_SECRET_<NAME> env vars per node; null for local-only dev.
+
+job_dir: /var/lib/zen-fed
+sync_interval_steps: 8
+aggregation: byzantine_robust
+
+nodes:
+  - name: spark
+    host: spark.local
+    role: hybrid                         # coordinator + worker
+    backend: cuda                        # GB10 Blackwell, CUDA via PyTorch
+    memory_gb: 128
+    nic_gbps: 200                        # ConnectX-7
+    tflops: 250                          # BF16 dense; FP4 ≈ 1 PFLOP (unused for router)
+    pin_experts: []                      # auto-pinned by scheduler at run time
+    pin_modalities: [text]
+    auth_token: ${ZEN_LAB_SECRET_SPARK}
+
+  - name: dbc
+    host: dbc.local
+    role: worker
+    backend: mlx                         # MLX is ~2× MPS — required at 128 GB
+    memory_gb: 128
+    nic_gbps: 10                         # 10 GbE; bump to 80 if TB5 networking
+    tflops: 34                           # M4 Max GPU
+    pin_experts: []
+    pin_modalities: [vision, video, 3d]
+    auth_token: ${ZEN_LAB_SECRET_DBC}
+
+  - name: evo
+    host: evo.local
+    role: worker
+    backend: rocm                        # EVO-X2 = Ryzen AI Max+ 395 / Radeon 8060S
+    memory_gb: 128
+    nic_gbps: 10
+    tflops: 60
+    pin_experts: []
+    pin_modalities: [text, audio]
+    auth_token: ${ZEN_LAB_SECRET_EVO}
+
+  - name: m1max
+    host: m1max.local
+    role: worker
+    backend: mlx
+    memory_gb: 64
+    nic_gbps: 10
+    tflops: 10                           # M1 Max GPU (32-core variant)
+    pin_experts: [qwen35_0_8b, qwen35_9b]   # T0+T1 small dense — fit cleanly
+    pin_modalities: [text]
+    auth_token: ${ZEN_LAB_SECRET_M1MAX}
